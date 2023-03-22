@@ -1,0 +1,296 @@
+CREATE DATABASE FacturacionElectri
+GO
+USE FacturacionElectri
+GO
+-----------------------------SCHEMAS DE LA BASE DE DATOS-----------------------------
+CREATE SCHEMA [GEOGRAPHY];
+GO
+
+CREATE SCHEMA COMPANY;
+GO
+
+CREATE SCHEMA CUSTOMER;
+GO
+-----------------------------QUERY PARA CREAR TABLAS-----------------------------
+CREATE TABLE [GEOGRAPHY].[Municipio]
+(
+    IdMunicipio INT IDENTITY(1,1) NOT NULL, --PRIMARY KEY
+    NombreMunicipio VARCHAR(30) NOT NULL,
+    IdProvincia INT NOT NULL, --FOREIGNKEY TABLA PROVINCIA
+    Ubicacion GEOGRAPHY NOT NULL
+)
+GO
+
+CREATE TABLE [GEOGRAPHY].[Provincia]
+(
+    IdProvincia INT IDENTITY(1,1) NOT NULL, --PRIMARY KEY
+    NombreProvincia VARCHAR(30) NOT NULL,
+    IdRegion INT NOT NULL, --FOREIGNKEY TABLA REGION
+    Ubicacion GEOGRAPHY NOT NULL
+)
+GO
+
+
+CREATE TABLE [GEOGRAPHY].[Region]
+(
+    IdRegion INT IDENTITY(1,1) NOT NULL, --PRIMARY KEY
+    NombreRegion VARCHAR(30) NOT NULL
+)
+
+GO
+
+CREATE TABLE [CUSTOMER].[Cliente]
+(
+    IdCliente INT IDENTITY(1,1) NOT NULL, --PRIMARY KEY
+    Nombre VARCHAR(30) NOT NULL,
+    Apellido VARCHAR(30) NOT NULL,
+    FechaNacimiento DATE NOT NULL,
+    Cedula VARCHAR(12) UNIQUE NOT NULL,
+    CorreoElectronico VARCHAR(40) NOT NULL,
+    Telefono VARCHAR(10) NOT NULL,
+    Sexo VARCHAR(1) NOT NULL
+    --IdMunicipio INT NOT NULL, --FOREIGN KEY TABLA MUNICIPIO
+    --IdContrato VARCHAR(10) NOT NULL, --FOREIGN KEY TABLA CONTRATO,
+    --FechaIngreso DATETIME NOT NULL
+)
+GO
+
+CREATE TABLE [CUSTOMER].[Contrato]
+(
+    NIC VARCHAR(10) NOT NULL, --PRIMARY KEY
+    IdContador VARCHAR(15) NOT NULL, --FOREIGN KEY TABLA CONTADOR,
+    IdCliente INT NOT NULL, -- FOREIGN KEY TABLA CLIENTES
+    IdTarifa VARCHAR(7) NOT NULL, -- FOREIGN KEY TABLA TARIFA
+    PeriodoFacturacion INT NOT NULL,
+    Id_DireccionContrato INT NOT NULL --FOREIGN KEY TABLA DIRECCION
+)
+GO
+
+CREATE TABLE [CUSTOMER].[Tarifa]
+(
+    IdTarifa VARCHAR(7) NOT NULL,
+    CargoFijo DECIMAL(8,2) NOT NULL,
+    Cargo_PrimerNivel DECIMAL(8,2) NOT NULL,
+    Cargo_SegundoNivel DECIMAL(8,2) NOT NULL,
+    Cargo_TercerNivel DECIMAL(8,2) NOT NULL
+)
+GO
+--ALTER TABLE [CUSTOMER].[Tarifa] ADD CargoFijo DECIMAL(8,2) NOT NULL, Cargo_PrimerNivel DECIMAL(8,2) NOT NULL, Cargo_SegundoNivel DECIMAL(8,2) NOT NULL, Cargo_TercerNivel DECIMAL(8,2) NOT NULL
+
+
+CREATE TABLE [COMPANY].[Empleado]
+(
+    IdEmpleado INT NOT NULL, --PRIMARY KEY
+    Nombre VARCHAR(30) NOT NULL,
+    Apellido VARCHAR(30) NOT NULL,
+    Cedula VARCHAR(30) UNIQUE NOT NULL,
+    Telefono VARCHAR(12) NOT NULL,
+    CorreoElectronico VARCHAR(40) NOT NULL,
+    FechaNacimiento DATE NOT NULL,
+    FechaContratacion DATE NOT NULL,
+    IdMunicipio INT NOT NULL, --FOREING KEY TABLA MUNICIPIO
+	IdSucursal INT NOT NULL --FOREING KEY TABLA SUCURSAL
+)
+GO
+
+CREATE TABLE [COMPANY].[Sucursal]
+(
+    IdSucursal INT NOT NULL, --PRIMARY KEY
+    Direccion VARCHAR(50) NOT NULL,
+    Ubicacion GEOMETRY NOT NULL
+)
+GO
+
+CREATE TABLE [COMPANY].[Factura]
+(
+    IdFactura INT NOT NULL, --PRIMARY KEY
+    IdContrato  VARCHAR(10) NOT NULL, --FOREING KEY TABLA CONTRATO
+    IdEmpleado  INT NULL, --FOREING KEY TABLA EMPLEADO,
+    FechaEmision DATE NOT NULL,
+	CodTarifa VARCHAR(7) NOT NULL
+)
+GO
+
+CREATE TABLE [COMPANY].[Factura_Detalle]
+(
+    IdDetalle INT NOT NULL, --PRIMARY KEY PARTE DE LA SUPER LLAVE
+    IdFactura INT NOT NULL, --PRIMARY KEY PARTE DE LA SUPER LLAVE
+    IdServicio INT NOT NULL, --FOREIGN KEY TABLA SERVICIO
+)
+GO
+
+CREATE TABLE [COMPANY].[Servicio]
+(
+    IdServicio INT NOT NULL, --PRIMARY KEY
+    Descripcion VARCHAR(100) NOT NULL,
+)
+GO
+
+CREATE TABLE [COMPANY].[Contador]
+(
+    NoContador VARCHAR(15) NOT NULL, --PRIMARY KEY
+    Ubicacion GEOGRAPHY NOT NULL,
+    Activo BIT NOT NULL,
+    FechaIngreso DATETIME NOT NULL,
+	IdServicio INT NOT NULL --FOREIGN KEY TABLA SERVICIO
+)
+GO
+--ALTER TABLE COMPANY.Contador ADD Ubicacion GEOGRAPHY NOT NULL
+
+CREATE TABLE[COMPANY].[Medicion]
+(
+    IdMedicion INT NOT NULL, --PRIMARY KEY
+    NoContador VARCHAR(15) NOT NULL, --FOREIGN KEY TABLA CONTADOR
+    EnergiaConsumida INT NOT NULL,
+    FechaMedicion DATE NOT NULL,
+    FechaIngreso DATETIME NOT NULL
+)
+GO
+
+CREATE TABLE [COMPANY].[Poste]
+(
+    IdPoste VARCHAR(10) NOT NULL, --PRIMARY KEY
+    NoContador VARCHAR(15) NOT NULL, --FOREIGN KEY TABLA CONTADOR
+    Ubicacion GEOMETRY NOT NULL
+    --IdMunicipio INT NOT NULL --FOREING KEY TABLA MUNICIPIO
+)
+GO
+
+CREATE TABLE [GEOGRAPHY].[Direccion]
+(
+  IdDireccion INT NOT NULL, --PRIMARY KEY
+  [No.] VARCHAR(4) NOT NULL,
+  [Piso/dpto] VARCHAR(4) NOT NULL,
+  Finca VARCHAR(4) NULL,
+  Ref VARCHAR(100) NOT NULL,
+  Localidad VARCHAR(30) NOT NULL,
+  Seccion VARCHAR(40) NOT NULL,
+  IdMunicipio INT NOT NULL, --FOREIGN KEY TABLA MUNICIPIO
+  --IdProvincia INT NOT NULL, --FOREIGN KEY TABLA PROVINCIA
+  Ruta VARCHAR(4) NOT NULL,
+  Itiner VARCHAR(10) NOT NULL,
+  Ubicacion GEOGRAPHY NOT NULL
+)
+
+--ALTER table [GEOGRAPHY].[Direccion] add Ubicacion GEOGRAPHY NOT NULL
+
+-----------------------------QUERY PARA ESTALBLECER PRIMARY KEY -----------------------------
+
+ALTER TABLE [GEOGRAPHY].[Municipio]
+ADD CONSTRAINT PK_Municipio PRIMARY KEY CLUSTERED (IdMunicipio)
+
+ALTER TABLE [GEOGRAPHY].[Provincia]
+ADD CONSTRAINT PK_Provincia PRIMARY KEY CLUSTERED (IdProvincia)
+
+ALTER TABLE [GEOGRAPHY].[Region]
+ADD CONSTRAINT PK_Region PRIMARY KEY CLUSTERED (IdRegion)
+
+ALTER TABLE [CUSTOMER].[Cliente]
+ADD CONSTRAINT PK_Cliente PRIMARY KEY CLUSTERED (IdCliente)
+
+ALTER TABLE [CUSTOMER].[Contrato]
+ADD CONSTRAINT PK_Contrato PRIMARY KEY CLUSTERED (NIC)
+
+ALTER TABLE [COMPANY].[Empleado]
+ADD CONSTRAINT PK_Empleado PRIMARY KEY CLUSTERED (IdEmpleado)
+
+ALTER TABLE [COMPANY].[Sucursal]
+ADD CONSTRAINT PK_Sucursal PRIMARY KEY CLUSTERED (IdSucursal)
+
+ALTER TABLE [COMPANY].[Factura]
+ADD CONSTRAINT PK_Factura PRIMARY KEY CLUSTERED (IdFactura)
+
+ALTER TABLE [COMPANY].[Factura_Detalle]
+ADD CONSTRAINT PK_Factura_Detalle PRIMARY KEY CLUSTERED (IdDetalle, IdFactura)
+
+ALTER TABLE [COMPANY].[Servicio]
+ADD CONSTRAINT PK_Servicio PRIMARY KEY CLUSTERED (IdServicio)
+
+ALTER TABLE [COMPANY].[Contador]
+ADD CONSTRAINT PK_Contador PRIMARY KEY CLUSTERED (NoContador)
+
+ALTER TABLE [COMPANY].[Medicion]
+ADD CONSTRAINT PK_Medicion PRIMARY KEY CLUSTERED (IdMedicion)
+
+ALTER TABLE [COMPANY].[Poste]
+ADD CONSTRAINT PK_Poste PRIMARY KEY CLUSTERED (IdPoste)
+
+ALTER TABLE [GEOGRAPHY].[Direccion]
+ADD CONSTRAINT PK_Direccion PRIMARY KEY CLUSTERED (IdDireccion)
+
+
+-----------------------------QUERY PARA ESTALBLECER FOREIGN KEY -----------------------------
+ALTER TABLE [GEOGRAPHY].[Municipio]
+ADD CONSTRAINT FK_Municipio_Provincia FOREIGN KEY (IdProvincia)
+REFERENCES [GEOGRAPHY].[Provincia] (IdProvincia)
+
+ALTER TABLE [GEOGRAPHY].[Provincia]
+ADD CONSTRAINT FK_Provincia_Region FOREIGN KEY (IdRegion)
+REFERENCES [GEOGRAPHY].[Region] (IdRegion)
+
+ALTER TABLE [GEOGRAPHY].[Direccion]
+ADD CONSTRAINT FK_Direccion_Municipio FOREIGN KEY (IdMunicipio)
+REFERENCES [GEOGRAPHY].[Municipio] (IdMunicipio)
+
+
+/*ALTER TABLE [dbo].[Cliente]
+ADD CONSTRAINT FK_Cliente_Municipio FOREIGN KEY (IdMunicipio)
+REFERENCES [dbo].[Municipio] (IdMunicipio)*/
+
+/*ALTER TABLE [dbo].[Cliente]
+ADD CONSTRAINT FK_Cliente_Contrato  FOREIGN KEY (IdContrato)
+REFERENCES [dbo].[Contrato] (NIC)*/
+
+
+ALTER TABLE [CUSTOMER].[Contrato]
+ADD CONSTRAINT FK_Contrato_Contador FOREIGN KEY (IdContador)
+REFERENCES [COMPANY].[Contador] (NoContador)
+
+ALTER TABLE [CUSTOMER].[Contrato]
+ADD CONSTRAINT FK_Contrato_Cliente FOREIGN KEY (IdCliente)
+REFERENCES [CUSTOMER].[Cliente] (IdCliente)
+
+ALTER TABLE [CUSTOMER].[Contrato]
+ADD CONSTRAINT FK_Direccion_Contrato FOREIGN KEY(Id_DireccionContrato)
+REFERENCES [GEOGRAPHY].[Direccion] (IdDireccion)
+
+
+ALTER TABLE [COMPANY].[Empleado]
+ADD CONSTRAINT FK_Empleado_Municipio  FOREIGN KEY (IdMunicipio)
+REFERENCES [GEOGRAPHY].[Municipio] (IdMunicipio)
+
+ALTER TABLE [COMPANY].[Empleado]
+ADD CONSTRAINT FK_Empleado_Sucursal  FOREIGN KEY (IdSucursal)
+REFERENCES [COMPANY].[Sucursal] (IdSucursal)
+
+
+ALTER TABLE [COMPANY].[Factura]
+ADD CONSTRAINT FK_Contrato_Factura  FOREIGN KEY (IdContrato)
+REFERENCES [CUSTOMER].[Contrato] (NIC)
+
+ALTER TABLE [COMPANY].[Factura]
+ADD CONSTRAINT FK_Factura_Empleado  FOREIGN KEY (IdEmpleado)
+REFERENCES [COMPANY].[Empleado] (IdEmpleado)
+
+
+ALTER TABLE [COMPANY].[Factura_Detalle]
+ADD CONSTRAINT FK_Servicio_Factura_Detalle  FOREIGN KEY (IdServicio)
+REFERENCES [COMPANY].[Servicio] (IdServicio)
+
+ALTER TABLE [COMPANY].[Contador]
+ADD CONSTRAINT FK_Servicio_Contador  FOREIGN KEY (IdServicio)
+REFERENCES [COMPANY].[Servicio] (IdServicio)
+
+ALTER TABLE [COMPANY].[Medicion]
+ADD CONSTRAINT FK_Contador_Medicion  FOREIGN KEY (NoContador)
+REFERENCES [COMPANY].[Contador] (NoContador)
+
+
+/*ALTER TABLE [dbo].[Poste]
+ADD CONSTRAINT FK_Poste_Municipio FOREIGN KEY (IdMunicipio)
+REFERENCES [dbo].[Municipio] (IdMunicipio)*/
+
+ALTER TABLE [COMPANY].[Poste]
+ADD CONSTRAINT FK_Contador_Poste FOREIGN KEY (NoContador)
+REFERENCES [COMPANY].[Contador] (NoContador)
+
