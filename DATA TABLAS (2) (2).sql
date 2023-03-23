@@ -263,6 +263,8 @@ INSERT INTO [COMPANY].Contador VALUES
 
 INSERT INTO [COMPANY].Contador VALUES
 ('44EVGG', GEOGRAPHY::Point(18.474444827821983, -69.88678021229427, 4326), 0, GETDATE(), 1)
+INSERT INTO [COMPANY].Contador VALUES
+('7etrr44', GEOGRAPHY::Point(18.474444827821983, -69.88678021229427, 4326), 0, GETDATE(), 1)
 
 SELECT * FROM [CUSTOMER].[Contrato]
 
@@ -277,6 +279,10 @@ INSERT INTO [CUSTOMER].[Contrato] VALUES
 INSERT INTO [CUSTOMER].[Contrato] VALUES
 
 ('3DSEZZ', '44EVGG', 3, 'BTS1', 25, 2)
+
+INSERT INTO [CUSTOMER].[Contrato] VALUES
+
+('ASDDF44', '7etrr44', 3, 'BTS1', 25, 2)
 
 
 SELECT * FROM [COMPANY].Medicion
@@ -305,6 +311,9 @@ INSERT INTO [COMPANY].Medicion VALUES
 (6, '44EVGG', 2, '2022-04-30', GETDATE())
 GO
 
+INSERT INTO [COMPANY].Medicion VALUES
+(7, '7etrr44', 2, '2022-04-30', GETDATE())
+GO
 
 DROP PROCEDURE WAO
 AS 
@@ -318,11 +327,6 @@ SELECT @TEST * 6.17
 END
 GO
 
-SELECT id_columna, COUNT(*) as num_registros 
-FROM mi_tabla 
-GROUP BY id_columna;
-
-
 EXEC WAO
 GO
 ALTER PROCEDURE Factura_Mes
@@ -330,21 +334,8 @@ ALTER PROCEDURE Factura_Mes
 @mesAnterior INT
 AS
 BEGIN
-IF EXISTS(SELECT NoContador FROM [COMPANY].Medicion GROUP BY NoContador HAVING COUNT(*) = 1)
-BEGIN
-SELECT ((SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesActual  AND NoContador= C.IdContador)) * 
-(SELECT Cargo_PrimerNivel FROM CUSTOMER.Tarifa WHERE IdTarifa = C.IdTarifa)  
-AS Costo, M.NoContador, C.IdContador, C.IdCliente
-FROM [COMPANY].Medicion M--GROUP BY NoContador
-INNER JOIN [CUSTOMER].Contrato C ON  M.NoContador = C.IdContador
-INNER JOIN [CUSTOMER].Tarifa T ON  C.IdTarifa = T.IdTarifa
-GROUP BY M.NoContador, T.Cargo_PrimerNivel, C.IdTarifa, M.NoContador, C.IdContador, C.IdCliente
-END
-
-ELSE
-
 SELECT ((SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesActual  AND NoContador= C.IdContador) - 
-(SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesAnterior AND NoContador= C.IdContador )) * 
+ISNULL(0, (SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesAnterior AND NoContador= C.IdContador ))) * 
 (SELECT Cargo_PrimerNivel FROM CUSTOMER.Tarifa WHERE IdTarifa = C.IdTarifa)  
 AS Costo, M.NoContador, C.IdContador, C.IdCliente
 FROM [COMPANY].Medicion M--GROUP BY NoContador
@@ -354,13 +345,8 @@ GROUP BY M.NoContador, T.Cargo_PrimerNivel, C.IdTarifa, M.NoContador, C.IdContad
 END
 GO
 
-SELECT ((SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE NoContador = '123EVGA') - 
-(SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE  NoContador = '123EVGA')) * (SELECT Cargo_PrimerNivel FROM CUSTOMER.Tarifa WHERE IdTarifa = C.IdTarifa) 
-AS OLA 
-FROM [COMPANY].Medicion M
-INNER JOIN [CUSTOMER].Contrato C ON  M.NoContador = C.IdContador
-INNER JOIN [CUSTOMER].Tarifa T ON  C.IdTarifa = T.IdTarifa
-GROUP BY M.NoContador, T.Cargo_PrimerNivel, C.IdTarifa, M.NoContador
+
+
 
 
 
