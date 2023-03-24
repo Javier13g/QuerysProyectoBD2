@@ -1,5 +1,7 @@
+--DATA TABLA REGION
 INSERT INTO [GEOGRAPHY].[Region] VALUES ('Norte'), ('Sur'), ('Este')
 GO
+
 --DATA PARA TABLA PROVINCIA
 INSERT INTO [GEOGRAPHY].[Provincia] 
 VALUES ('Azua', 2, geography::Point(18.45319, -70.7349, 4326)),
@@ -40,6 +42,8 @@ GO
 SELECT * FROM Provincia
 DELETE FROM Municipio
 DBCC CHECKIDENT ('Municipio', RESEED, 0)*/
+
+--DATA TABLA MUNICIPIO
 INSERT INTO [GEOGRAPHY].[Municipio] 
 VALUES ('Altamira', 21, geography::Point(19.66776342247362, -70.82765606205582, 4326)),
 ('Arenoso', 5, geography::Point(19.187548251417443, -69.85987203496069, 4326)),
@@ -205,6 +209,8 @@ GO
 /*DELETE FROM  [CUSTOMER].[Cliente]
 DBCC CHECKIDENT ('[CUSTOMER].[Cliente]', RESEED, 0)*/
 
+--DATA TABLA CLIENTES
+
 INSERT INTO [CUSTOMER].[Cliente] VALUES ('Andiel Rey', 'Cuevas Ronzales', '3-09-2001', '40244000',
 'ejemplo@gmail.com', '829000', 'M'),
 ('Almeida Secular', 'Rosa Adames', '3-09-1975', '40244001',
@@ -227,6 +233,7 @@ INSERT INTO [CUSTOMER].[Cliente] VALUES ('Andiel Rey', 'Cuevas Ronzales', '3-09-
 'ejemplo9@gmail.com', '829009', 'M')
 GO
 
+--DATA TABLA DIRECCION
 
 SELECT * FROM [GEOGRAPHY].[Direccion]
 
@@ -238,8 +245,9 @@ INSERT INTO [GEOGRAPHY].[Direccion] VALUES
 (2,'54', '2','', 'Entre tal y tal calle 2', 'Ciudad Colonial', 'Zona Urbana', 134, '13', '0003', 
 geography::Point(18.474444827821983, -69.88678021229427, 4326))
 
-SELECT * FROM [CUSTOMER].[Tarifa]
+--SELECT * FROM [CUSTOMER].[Tarifa]
 
+--DATA TABLA TARIFA
 INSERT INTO [CUSTOMER].[Tarifa] VALUES
 ('BTS1', 50.02, 6.17, 8.71, 13.04)
 
@@ -247,14 +255,16 @@ INSERT INTO [CUSTOMER].[Tarifa] VALUES
 ('BTS2', 51.02, 8.79, 11.10, 13.43)
 
 
-SELECT * FROM [COMPANY].Servicio
+--SELECT * FROM [COMPANY].Servicio
 
+--DATA TABLA SERVICIO
 INSERT INTO [COMPANY].Servicio VALUES
 (1, 'Ola')
 
 
-SELECT * FROM [COMPANY].Contador
+--SELECT * FROM [COMPANY].Contador
 
+--DATA TABLA CONTADOR
 INSERT INTO [COMPANY].Contador VALUES
 ('123EVGA', GEOGRAPHY::Point(18.474444827821983, -69.88678021229427, 4326), 0, GETDATE(), 1)
 
@@ -266,8 +276,9 @@ INSERT INTO [COMPANY].Contador VALUES
 INSERT INTO [COMPANY].Contador VALUES
 ('7etrr44', GEOGRAPHY::Point(18.474444827821983, -69.88678021229427, 4326), 0, GETDATE(), 1)
 
-SELECT * FROM [CUSTOMER].[Contrato]
 
+--DATA TABLA CONTRATO
+--SELECT * FROM [CUSTOMER].[Contrato]
 INSERT INTO [CUSTOMER].[Contrato] VALUES
 
 ('4DE2BF', '123EVGA', 1, 'BTS1', 25, 1)
@@ -284,10 +295,7 @@ INSERT INTO [CUSTOMER].[Contrato] VALUES
 
 ('ASDDF44', '7etrr44', 3, 'BTS1', 25, 2)
 
-
-SELECT * FROM [COMPANY].Medicion
-SELECT * FROM [CUSTOMER].Tarifa
-
+--DATA TABLA MEDICION
 INSERT INTO [COMPANY].Medicion VALUES
 (1, '123EVGA', 100, '2022-03-20', GETDATE())
 
@@ -315,7 +323,7 @@ INSERT INTO [COMPANY].Medicion VALUES
 (7, '7etrr44', 2, '2022-04-30', GETDATE())
 GO
 
-DROP PROCEDURE WAO
+/*DROP PROCEDURE WAO
 AS 
 BEGIN
 DECLARE @TEST DECIMAL(8,2);
@@ -328,27 +336,5 @@ END
 GO
 
 EXEC WAO
-GO
-ALTER PROCEDURE Factura_Mes
-@mesActual INT,
-@mesAnterior INT
-AS
-BEGIN
-SELECT ((SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesActual  AND NoContador= C.IdContador) - 
-ISNULL(0, (SELECT EnergiaConsumida FROM [COMPANY].Medicion WHERE MONTH(FechaMedicion) = @mesAnterior AND NoContador= C.IdContador ))) * 
-(SELECT Cargo_PrimerNivel FROM CUSTOMER.Tarifa WHERE IdTarifa = C.IdTarifa)  
-AS Costo, M.NoContador, C.IdContador, C.IdCliente
-FROM [COMPANY].Medicion M--GROUP BY NoContador
-INNER JOIN [CUSTOMER].Contrato C ON  M.NoContador = C.IdContador
-INNER JOIN [CUSTOMER].Tarifa T ON  C.IdTarifa = T.IdTarifa
-GROUP BY M.NoContador, T.Cargo_PrimerNivel, C.IdTarifa, M.NoContador, C.IdContador, C.IdCliente
-END
-GO
+GO*/
 
-
-
-
-
-
-
-SELECT * FROM [COMPANY].Medicion
